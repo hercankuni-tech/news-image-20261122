@@ -1,0 +1,11 @@
+{
+  "name": "news-image-20261122",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "Deterministic 1024x1024 PNG summary of 22 November 2026 world news; stdlib only.",
+  "scripts": {
+    "start": "node --experimental-strip-types main.ts"
+  }
+}
