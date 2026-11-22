@@ -3,7 +3,7 @@
  * news-image-20261122 entry.
  *
  * Renders ONE deterministic 1024x1024 PNG that summarises 6-10 real world-news
- * stories of 22 November 2026. Everything is drawn by hand into an RGBA raster
+ * stories of 22 November 2026. Everything is drawn by hand into an RGB raster
  * with a 5x7 bitmap font, then encoded as a PNG using node:zlib only.
  *
  * Stdlib only. No network, no clock, no randomness -> two runs are byte-identical.
@@ -115,7 +115,7 @@ const GLYPHS: Record<string, string[]> = {
   "'": ['..#..', '..#..', '.#...', '.....', '.....', '.....', '.....'],
   '"': ['.#.#.', '.#.#.', '.....', '.....', '.....', '.....', '.....'],
   '(': ['...#.', '..#..', '.#...', '.#...', '.#...', '..#..', '...#.'],
-  ')': ['. #..', '..#..', '...#.', '...#.', '...#.', '..#..', '.#...'],
+  ')': ['..#..', '.#...', '.#...', '.#...', '.#...', '.#...', '..#..'],
   '/': ['....#', '....#', '...#.', '..#..', '.#...', '#....', '#....'],
   '+': ['.....', '..#..', '..#..', '#####', '..#..', '..#..', '.....'],
   '!': ['..#..', '..#..', '..#..', '..#..', '..#..', '.....', '..#..'],
@@ -340,6 +340,14 @@ function encodePng(width: number, height: number, rgb: Uint8Array): Buffer {
 /* ------------------------------------------------------------------ */
 render();
 const png = encodePng(W, H, px);
+
+// Verify the encoded buffer before writing it out.
+const PNG_MAGIC = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+if (!png.subarray(0, 8).equals(PNG_MAGIC)) throw new Error('bad PNG magic');
+if (png.readUInt32BE(16) !== W || png.readUInt32BE(20) !== H) {
+  throw new Error('IHDR size mismatch');
+}
+
 const outDir = process.env.MAKEFUN_OUTPUT_DIR
   ? resolve(process.env.MAKEFUN_OUTPUT_DIR)
   : resolve('output');
